@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--
+    配置数据库连接信息
+    -->
+    <!--文件引用 -->
+    <context:property-placeholder location="classpath:database.properties"/>
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+<!--        <property name="driverClass" value="${driver}"/>-->
+<!--        <property name="jdbcUrl" value="${url}"/>-->
+<!--        <property name="user" value="${username}"/>-->
+<!--        <property name="password" value="${password}"/>-->
+
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://47.98.116.55:3306?useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="my-secret-pw"/>
+
+        <!--
+        c3p0 独有属性
+        -->
+        <!-- 最大数量连接池 -->
+        <property name="maxPoolSize" value="30"/>
+        <!-- 最小数量连接池 -->
+        <property name="minPoolSize" value="10"/>
+        <!-- 关闭连接后不自动连接 -->
+        <property name="autoCommitOnClose" value="false"/>
+        <!-- 连接超时时间 -->
+        <property name="checkoutTimeout" value="10000"/>
+        <!-- 重连次数 -->
+        <property name="acquireIncrement" value="2"/>
+
+    </bean>
+
+    <!--
+       根据配置创建仓库
+     -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引入数据库连接信息实现配置 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 引入mybatis配置 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!--
+       动态接口注入
+     -->
+
+    <bean id="sqlSessionTemplem" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 接口地址 -->
+        <property name="basePackage" value="com.jiekeliu.mapper"/>
+        <!-- 模板创建 -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+
+
+</beans>
